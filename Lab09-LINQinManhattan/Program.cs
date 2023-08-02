@@ -22,13 +22,19 @@ namespace Lab09_LINQinManhattan
 
             Location[] locations = featureCollection.features;
             Console.WriteLine(locations);
-            Part1WithLINQ(locations);
 
-
-
-
+            // Output all of the neighborhoods
+            OutputAllNeighborhoods(locations);
+            // Filter out all the neighborhoods that do not have any names
+            FilterOutNamelessNeighborhoods(locations);
+            // Remove the duplicates
+            RemoveDuplicateNeighborhoods(locations);
+            // Rewrite the queries from above and consolidate all into one single query
+            ConsolidatedQuery(locations);
+            // Rewrite at least one of these questions only using the opposing method
+            RemoveDuplicateNeighborhoodsQuerySyntax(locations);
         }
-       
+
         public static void Part1(Location[] items)
         {
             Dictionary<string, int> locationAppearances = new Dictionary<string, int>();
@@ -57,17 +63,57 @@ namespace Lab09_LINQinManhattan
 
         }
 
-        public static void Part1WithLINQ(Location[] items)
+        public static void FilterOutNamelessNeighborhoods(Location[] items)
         {
-            var neighborHoodQuery = from item in items
-                                    group item by item.properties.neighborhood into grouped
-                                    select new { Key = grouped.Key, Value = grouped.Count() };
+            var namedNeighborhoods = items.Where(item => !string.IsNullOrEmpty(item.properties.neighborhood));
 
-            foreach (var location in neighborHoodQuery)
+            foreach (var neighborhood in namedNeighborhoods)
             {
-                Console.WriteLine($"{location.Key}: {location.Value}");
+                Console.WriteLine(neighborhood.properties.neighborhood);
+            }
+        }
+        public static void OutputAllNeighborhoods(Location[] items)
+        {
+            var allNeighborhoods = items.Select(item => item.properties.neighborhood);
+
+            foreach (var neighborhood in allNeighborhoods)
+            {
+                Console.WriteLine(neighborhood);
             }
         }
 
+        public static void RemoveDuplicateNeighborhoods(Location[] items)
+        {
+            var uniqueNeighborhoods = items.Select(item => item.properties.neighborhood).Distinct();
+
+            foreach (var neighborhood in uniqueNeighborhoods)
+            {
+                Console.WriteLine(neighborhood);
+            }
+        }
+
+        public static void ConsolidatedQuery(Location[] items)
+        {
+            var results = items
+                .Select(item => item.properties.neighborhood)
+                .Where(neighborhood => !string.IsNullOrEmpty(neighborhood))
+                .Distinct();
+
+            foreach (var neighborhood in results)
+            {
+                Console.WriteLine(neighborhood);
+            }
+        }
+
+        public static void RemoveDuplicateNeighborhoodsQuerySyntax(Location[] items)
+        {
+            var uniqueNeighborhoods = (from item in items
+                                       select item.properties.neighborhood).Distinct();
+
+            foreach (var neighborhood in uniqueNeighborhoods)
+            {
+                Console.WriteLine(neighborhood);
+            }
+        }
     }
 }
